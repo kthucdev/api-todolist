@@ -41,7 +41,7 @@ func (h *TaskHandler) CreateTask(c *gin.Context) {
 		Description: task.Description,
 		Completed:   false,
 	})
-	c.JSON(http.StatusCreated, gin.H{"id": id})
+	c.JSON(http.StatusCreated, id)
 }
 
 func (h *TaskHandler) GetTasks(c *gin.Context) {

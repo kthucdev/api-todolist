@@ -1,43 +1,33 @@
-# Simple Makefile for a Go project
+IMAGE_NAME=go-todolist-api
+CONTAINER_NAME=go-todolist-container
+PORT=8080
 
 # Build the application
 all: build test
 
+# Build Docker image
 build:
-	@echo "Building..."
-	
-	
-	@go build -o main cmd/api/main.go
+	docker build -t $(IMAGE_NAME) .
 
 # Run the application
-run:
-	@go run cmd/api/main.go
+run: 
+	docker run -d -p 8080:8080 -v $(PWD):/app --name go-todolist-container go-todolist-api
+
+# Stop container
+stop:
+	docker stop $(CONTAINER_NAME)
+
+# Log the container
+logs:
+	docker logs -f $(CONTAINER_NAME)
 
 # Test the application
 test:
 	@echo "Testing..."
 	@go test ./... -v
 
-# Clean the binary
-clean:
-	@echo "Cleaning..."
-	@rm -f main
+clean: stop
+	docker rm $(CONTAINER_NAME) || true
+	docker rmi $(IMAGE_NAME) || true
 
-# Live Reload
-watch:
-	@if command -v air > /dev/null; then \
-            air; \
-            echo "Watching...";\
-        else \
-            read -p "Go's 'air' is not installed on your machine. Do you want to install it? [Y/n] " choice; \
-            if [ "$$choice" != "n" ] && [ "$$choice" != "N" ]; then \
-                go install github.com/air-verse/air@latest; \
-                air; \
-                echo "Watching...";\
-            else \
-                echo "You chose not to install air. Exiting..."; \
-                exit 1; \
-            fi; \
-        fi
-
-.PHONY: all build run test clean watch
+.PHONY: build run clean
